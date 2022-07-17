@@ -110,6 +110,10 @@ def test_get_attribute_value(settings, content, attribute_name, expected):
             '<h1 id="pang" class="[ping]" data-flip="flop">Pong</h1>'
         ),
     ),
+    (
+        '<div class="foo bar-{% cycle "1" "2" "3" %}">Lorem ipsum</div>',
+        '<div class="[foo bar-{% cycle "1" "2" "3" %}]">Lorem ipsum</div>',
+    ),
 ])
 def test_process_source(content, expected):
     """
