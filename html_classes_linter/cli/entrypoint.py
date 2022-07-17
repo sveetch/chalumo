@@ -8,11 +8,11 @@ from pathlib import Path
 
 import click
 
-from html_classes_linter import __version__
+from html_classes_linter import __pkgname__, __version__
 
 from html_classes_linter.logger import init_logger
 
-from html_classes_linter.linter import HtmlAttributeCleaner
+from ..diff import HtmlAttributeDiff
 
 
 # Default logger conf
@@ -31,13 +31,13 @@ APP_LOGGER_CONF = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", None)
 @click.option(
     "--mode",
     metavar="STRING",
-    prompt="Operation mode",
     type=click.Choice(["lint", "diff", "reformat"]),
     help=(
         "Operation mode to perform. "
         "'lint' will just perform parse and return problems."
+        "'diff' will output of diff changes for every files with lint issues."
     ),
-    default="lint"
+    default="diff"
 )
 @click.option(
     '-v', '--verbose',
@@ -71,36 +71,36 @@ def cli_frontend(basepath, mode, verbose, version_mode):
     levels.reverse()
     # Init the logger config
     logger = init_logger(
-        "html-classes-linter",
+        __pkgname__,
         levels[verbose],
         printout=printout
     )
 
     # Version display mode only
     if version_mode:
-        click.echo("html-classes-linter {}".format(__version__))
+        click.echo("{} {}".format(
+            __pkgname__,
+            __version__
+        ))
+        return
+
     # Other modes
     else:
         if not basepath:
             logger.critical("Argument 'basepath' is required.")
             raise click.Abort()
 
-        logger.info("basepath: {}".format(basepath))
-        logger.info("verbosity: {}".format(levels[verbose]))
-        logger.info("mode: {}".format(mode))
+        if mode == "lint":
+            raise NotImplementedError()
+        elif mode == "diff":
+            cleaner = HtmlAttributeDiff()
+        elif mode == "reformat":
+            raise NotImplementedError()
 
-    cleaner = HtmlAttributeCleaner()
+        # TODO: Use accurate method following mode option
+        logger.info("📂 Opening base directory: {}".format(basepath))
+        logger.info("🔧 Using pattern: {}".format(cleaner.file_search_pattern))
+        if cleaner.lint_tag:
+            logger.info("🔧 With starting lint tag: {}".format(cleaner.lint_tag))
 
-    if mode == "lint":
-        raise NotImplementedError()
-    elif mode == "diff":
-        print()
-        print("📂 Opening base directory:", basepath)
-        print("🔧 Using pattern:", cleaner.file_search_pattern)
-        print("🔧 With starting lint tag:", cleaner.lint_tag)
-        print()
-    elif mode == "reformat":
-        raise NotImplementedError()
-
-    # TODO: Use accurate method following mode option
-    cleaner.diff(basepath)
+        cleaner.run(basepath)

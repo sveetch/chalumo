@@ -12,6 +12,8 @@ import re
 from sys import getsizeof
 from pathlib import Path
 
+from .discovery import HtmlFileDiscovery
+
 
 class HtmlAttributeCleaner:
     """

@@ -20,5 +20,5 @@ def _extract_version(package_name):
         _conf = read_configuration(os.path.join(PROJECT_DIR, "setup.cfg"))
     return _conf["metadata"]["version"]
 
-
-__version__ = _extract_version("html-classes-linter")
+__pkgname__ = "html-classes-linter"
+__version__ = _extract_version(__pkgname__)

@@ -9,7 +9,9 @@ def test_version_ping(caplog):
     """
     runner = CliRunner()
 
-    result = runner.invoke(cli_frontend, ["version"])
+    result = runner.invoke(cli_frontend, ["--version"])
+
+    #print(result.output)
 
     assert result.exit_code == 0
 
