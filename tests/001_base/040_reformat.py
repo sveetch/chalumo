@@ -20,7 +20,7 @@ class MatchObject:
         """
         return self.content
 
-
+@pytest.mark.skip("TODO")
 @pytest.mark.parametrize("content, attribute_name, expected", [
     (
         'class="foo"',
@@ -30,7 +30,7 @@ class MatchObject:
 ])
 def test_get_attribute_value(settings, content, attribute_name, expected):
     """
-    TODO: Adapt to cover HtmlAttributeFix correctly
+    TODO: Dummy sample to adapt to fully cover HtmlAttributeFix
     """
     kwargs = {}
     if attribute_name:

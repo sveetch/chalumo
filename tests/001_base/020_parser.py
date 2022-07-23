@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from html_classes_linter.discovery import HtmlFileDiscovery
+from html_classes_linter.exceptions import ParserError
 from html_classes_linter.parser import HtmlAttributeParser
 
 
@@ -22,7 +23,7 @@ class MatchObject:
         return self.content
 
 
-class CustomCleaner(HtmlAttributeParser):
+class MockedHtmlAttributeParser(HtmlAttributeParser):
     """
     A dummy HtmlAttributeParser inheriter to override "attribute_cleaner" which will
     enclose attribute value in brackets just to test it's working.
@@ -35,6 +36,32 @@ class CustomCleaner(HtmlAttributeParser):
             "]" +
             self.attribute_end
         )
+
+
+@pytest.mark.parametrize("content, attribute_name, expected", [
+    (
+        'wrong',
+        None,
+        "wrong",
+    ),
+    (
+        "data-plip-plop='foo'",
+        "data-plip-plop",
+        "foo",
+    ),
+])
+def test_get_attribute_value_error(settings, content, attribute_name, expected):
+    """
+    Attribute parser should raise exception for unexpected invalid matching object.
+    """
+    kwargs = {}
+    if attribute_name:
+        kwargs["attribute_name"] = attribute_name
+
+    parser = HtmlAttributeParser(**kwargs)
+
+    with pytest.raises(ParserError):
+        value = parser.get_attribute_value(MatchObject(content))
 
 
 @pytest.mark.parametrize("content, attribute_name, expected", [
@@ -52,11 +79,6 @@ class CustomCleaner(HtmlAttributeParser):
         'class=" foo bar "',
         None,
         " foo bar ",
-    ),
-    (
-        'wrong',
-        None,
-        "wrong",
     ),
     (
         'data-plip-plop="foo"',
@@ -93,6 +115,10 @@ def test_get_attribute_value(settings, content, attribute_name, expected):
         "<p class='foo bar'>Lorem ipsum</p>",
     ),
     (
+        '<p class="foo bar" class="ping pong">Lorem ipsum</p>',
+        '<p class="[foo bar]" class="[ping pong]">Lorem ipsum</p>',
+    ),
+    (
         '<p class="foo bar"">Lorem ipsum</p>',
         '<p class="[foo bar]"">Lorem ipsum</p>',
     ),
@@ -110,21 +136,68 @@ def test_get_attribute_value(settings, content, attribute_name, expected):
             '<h1 id="pang" class="[ping]" data-flip="flop">Pong</h1>'
         ),
     ),
-    (
-        '<div class="foo bar-{% cycle "1" "2" "3" %}">Lorem ipsum</div>',
-        '<div class="[foo bar-{% cycle "1" "2" "3" %}]">Lorem ipsum</div>',
-    ),
 ])
 def test_process_source(content, expected):
     """
     Processed source should correctly reformat the attribute.
     """
-    parser = CustomCleaner()
+    parser = MockedHtmlAttributeParser()
 
     filepath, source, modified = parser.process_source("/foo", content)
 
     assert filepath == "/foo"
     assert source == content
+    assert modified == expected
+
+
+@pytest.mark.parametrize("source, expected", [
+    # This case demonstrated how Django template tag could break the parser because
+    # a tag can contains quotes. This is why pre processors exists.
+    (
+        '<div class="foo bar-{% cycle "1" "2" "3" %}">Lorem ipsum</div>',
+        '<div class="[foo bar-{% cycle ]"1" "2" "3" %}">Lorem ipsum</div>',
+    ),
+    # Following case demonstrate how invalid HTML can lead to wrong parsing.
+    (
+        '<div class="foo bar id="plip">Lorem ipsum</div>',
+        '<div class="[foo bar id=]"plip">Lorem ipsum</div>',
+    ),
+    (
+        '<div class="foo bar>ping <p class="bim">pong</p></div>',
+        '<div class="[foo bar>ping <p class=]"bim">pong</p></div>',
+    ),
+])
+def test_parser_process_source_failures(source, expected):
+    """
+    Demonstrating failures when HTML is invalid with too many quotes or even unclosed
+    attribute quote.
+
+    TODO:
+
+    Introducing a new linter rule to validate attribute content, like if it contains
+    quotes or equal sign, should be enough as a workaround so user could be warned
+    by linter before trying automatic reformat (or block him to reformat). The rule
+    should better raise a critical error.
+
+    NOTE:
+
+    Many special characters are not directly allowed in classnames (until escaped).
+    Most notably in our parsing context '>', '<', '=' are a hint there was parsing
+    failures because of invalid HTML (commonly unclosed attribute value missing ending
+    quote).
+
+    Also we may change the attribute regex pattern to exclude content "<" and ">"
+    characters, this won't totally fix the double quotes mess, but at least make the
+    lint more robust. Or maybe we need to be explicit and excluding/ignoring is not
+    a good way ?
+    """
+    parser = MockedHtmlAttributeParser()
+
+    filepath, original, modified = parser.process_source("/foo", source)
+
+    print(modified)
+
+    assert filepath == "/foo"
     assert modified == expected
 
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Exceptions
 ==========
@@ -7,9 +6,9 @@ Specific application exceptions.
 """
 
 
-class MyAppBaseException(Exception):
+class HtmlLinterException(Exception):
     """
-    Exception base.
+    Application base exception.
 
     You should never use it directly except for test purpose. Instead make or
     use a dedicated exception related to the error context.
@@ -17,8 +16,22 @@ class MyAppBaseException(Exception):
     pass
 
 
-class DummyError(MyAppBaseException):
+class ParserError(HtmlLinterException):
     """
-    Dummy exception sample to raise from your code.
+    Exception to raise on parser operation.
+    """
+    pass
+
+
+class PreProcessorError(HtmlLinterException):
+    """
+    Exception to raise on pre processor operation.
+    """
+    pass
+
+
+class PostProcessorError(HtmlLinterException):
+    """
+    Exception to raise on post processor operation.
     """
     pass
