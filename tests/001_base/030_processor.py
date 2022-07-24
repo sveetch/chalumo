@@ -8,7 +8,9 @@ from pathlib import Path
 import pytest
 
 from html_classes_linter.parser import HtmlAttributeParser
-from html_classes_linter.processor import DjangoPreProcessor, DjangoPostProcessor
+from html_classes_linter.processors.django import (
+    DjangoPreProcessor, DjangoPostProcessor,
+)
 
 from django.template.base import (
     Lexer, TokenType,
@@ -72,7 +74,10 @@ def test_django_template_parser():
     print("Tokens:", len(tokens))
     print()
     for token in tokens:
-        print(token, token.token_type, token.lineno, token.position, (token.token_type == TokenType.BLOCK))
+        print(
+            token, token.token_type, token.lineno, token.position,
+            (token.token_type == TokenType.BLOCK)
+        )
 
     # Source template is correctly cutted in expected tokens types
     assert len([item for item in tokens if (item.token_type == TokenType.TEXT)]) == 6
@@ -119,13 +124,13 @@ def test_django_preprocessor(source, expected, isolated):
     Pre-processor should correctly isolate every non text part and store original
     references.
     """
-    preprocessor = MockedDjangoPreProcessor(source)
+    preprocessor = MockedDjangoPreProcessor()
 
-    rendered = preprocessor.render()
+    rendered = preprocessor.render(source)
 
     assert rendered == expected
 
-    assert preprocessor.isolated_references == isolated
+    assert preprocessor.payload == isolated
 
 
 @pytest.mark.parametrize("source, expected", [
@@ -138,19 +143,24 @@ def test_django_preprocessor(source, expected, isolated):
         '<div class="[foo bar-⸦⸨⸠001⸡⸩⸧]">Lorem ipsum</div>',
     ),
     (
-        '<div {% if foo %}class="foo {% cycle "1" "2" "3" %}"{% else %} class="nope"{% endif %}>Lorem ipsum</div>',
-        '<div ⸦⸨⸠001⸡⸩⸧class="[foo ⸦⸨⸠002⸡⸩⸧]"⸦⸨⸠003⸡⸩⸧ class="[nope]"⸦⸨⸠004⸡⸩⸧>Lorem ipsum</div>',
+        (
+            '<div {% if foo %}class="foo {% cycle "1" "2" "3" %}"{% else %} '
+            'class="nope"{% endif %}>Lorem ipsum</div>'
+        ),
+        (
+            '<div ⸦⸨⸠001⸡⸩⸧class="[foo ⸦⸨⸠002⸡⸩⸧]"⸦⸨⸠003⸡⸩⸧ class="[nope]"⸦⸨⸠004⸡⸩⸧>'
+            'Lorem ipsum</div>'
+        ),
     ),
 ])
-def test_preprocessed_parser(source, expected):
+def test_django_preprocessed_parser(source, expected):
     """
     Check if pre processor technique does not break the parser.
     """
+    preprocessor = MockedDjangoPreProcessor()
+    rendered = preprocessor.render(source)
+
     parser = MockedHtmlAttributeParser()
-    preprocessor = MockedDjangoPreProcessor(source)
-
-    rendered = preprocessor.render()
-
     filepath, original, modified = parser.process_source("/foo", rendered)
 
     print(modified)
@@ -159,7 +169,7 @@ def test_preprocessed_parser(source, expected):
     assert modified == expected
 
 
-@pytest.mark.parametrize("source, expected, isolated", [
+@pytest.mark.parametrize("source, expected, references", [
     (
         '<div class="foo bar-⸦⸨⸠001⸡⸩⸧">Lorem ipsum</div>',
         '<div class="foo bar-{% cycle "1" "2" "3" %}">Lorem ipsum</div>',
@@ -168,8 +178,14 @@ def test_preprocessed_parser(source, expected):
         }
     ),
     (
-        '<div ⸦⸨⸠001⸡⸩⸧class="foo ⸦⸨⸠002⸡⸩⸧"\n⸦⸨⸠003⸡⸩⸧ \n    class="nope"⸦⸨⸠004⸡⸩⸧>Lorem ipsum</div>',
-        '<div {% if foo %}class="foo {% cycle "1" "2" "3" %}"\n{% else %} \n    class="nope"{% endif %}>Lorem ipsum</div>',
+        (
+            '<div ⸦⸨⸠001⸡⸩⸧class="foo ⸦⸨⸠002⸡⸩⸧"\n⸦⸨⸠003⸡⸩⸧ \n    '
+            'class="nope"⸦⸨⸠004⸡⸩⸧>Lorem ipsum</div>'
+        ),
+        (
+            '<div {% if foo %}class="foo {% cycle "1" "2" "3" %}"\n{% else %} \n    '
+            'class="nope"{% endif %}>Lorem ipsum</div>'
+        ),
         {
             "001": '{% if foo %}',
             "002": '{% cycle "1" "2" "3" %}',
@@ -178,13 +194,13 @@ def test_preprocessed_parser(source, expected):
         }
     ),
 ])
-def test_django_postprocessor(source, expected, isolated):
+def test_django_postprocessor(source, expected, references):
     """
     Post-processor should correctly restore isolated content in the right place.
     """
-    postprocessor = DjangoPostProcessor(source, isolated, DjangoPreProcessor.REFERENCE_SYNTAX)
+    postprocessor = DjangoPostProcessor(DjangoPreProcessor.REFERENCE_SYNTAX)
 
-    rendered = postprocessor.render()
+    rendered = postprocessor.render(source, references)
 
     assert rendered == expected
 
@@ -199,27 +215,81 @@ def test_django_postprocessor(source, expected, isolated):
         '<div class="[foo bar-{% cycle "1" "2" "3" %}]">Lorem ipsum</div>',
     ),
     (
-        '<div {% if foo %}class="foo {% cycle "1" "2" "3" %}"{% else %} class="nope"{% endif %}>Lorem ipsum</div>',
-        '<div {% if foo %}class="[foo {% cycle "1" "2" "3" %}]"{% else %} class="[nope]"{% endif %}>Lorem ipsum</div>',
+        (
+            '<div {% if foo %}class="foo {% cycle "1" "2" "3" %}"{% else %} '
+            'class="nope"{% endif %}>Lorem ipsum</div>'
+        ),
+        (
+            '<div {% if foo %}class="[foo {% cycle "1" "2" "3" %}]"{% else %} '
+            'class="[nope]"{% endif %}>Lorem ipsum</div>'
+        ),
     ),
     (
-        '<div class="foo{% if foo == "" %} plop{% if bar == "" %} plop{% endif %}{%else%} {{ foo }} {{ bar }}{% include "something.html" %}{# nope #}{% endif %}">Lorem ipsum</div>',
-        '<div class="[foo{% if foo == "" %} plop{% if bar == "" %} plop{% endif %}{% else %} {{ foo }} {{ bar }}{% include "something.html" %}{# nope #}{% endif %}]">Lorem ipsum</div>',
+        (
+            '<div class="foo{% if foo == "" %} plop{% if bar == "" %} '
+            'plop{% endif %}{%else%} {{ foo }} {{ bar }}{% include "something.html" %}'
+            '{# nope #}{% endif %}">Lorem ipsum</div>'
+        ),
+        (
+            '<div class="[foo{% if foo == "" %} plop{% if bar == "" %} plop{% endif %}'
+            '{% else %} {{ foo }} {{ bar }}{% include "something.html" %}{# nope #}'
+            '{% endif %}]">Lorem ipsum</div>'
+        ),
     ),
 ])
-def test_postprocessed_parser(source, expected):
+def test_django_process_combination(source, expected):
     """
-    Check the full technique flow with pre processor, parser and post processor.
+    Combine usage of pre processor, parser and post processor to check the full
+    technique flow.
     """
+    preprocessor = DjangoPreProcessor()
+    pre_rendered = preprocessor.render(source)
+
+    # Use the parser without Django compatibility enabled so we can manually use them
     parser = MockedHtmlAttributeParser()
-
-    preprocessor = DjangoPreProcessor(source)
-    pre_rendered = preprocessor.render()
-
     filepath, original, modified = parser.process_source("/foo", pre_rendered)
 
-    postprocessor = DjangoPostProcessor(modified, preprocessor.isolated_references, preprocessor.reference_syntax)
-    post_rendered = postprocessor.render()
+    postprocessor = DjangoPostProcessor(preprocessor.reference_syntax)
+    post_rendered = postprocessor.render(modified, preprocessor.payload)
 
     assert filepath == "/foo"
     assert post_rendered == expected
+
+
+@pytest.mark.parametrize("source, expected", [
+    (
+        (
+            '<div {% if foo %}class="foo {% cycle "1" "2" "3" %}"{% else %} '
+            'class="nope"{% endif %}>Lorem ipsum</div>'
+        ),
+        (
+            '<div {% if foo %}class="[foo {% cycle "1" "2" "3" %}]"{% else %} '
+            'class="[nope]"{% endif %}>Lorem ipsum</div>'
+        ),
+    ),
+    (
+        (
+            '<i class="{{ sample_icon }} icon-{{ k }}"></i>'
+        ),
+        (
+            '<i class="[{{ sample_icon }} icon-{{ k }}]"></i>'
+        ),
+    ),
+    (
+        (
+            '<div class="swiper-slide product-{% cycle "1" "2" "3" %}">'
+        ),
+        (
+            '<div class="[swiper-slide product-{% cycle "1" "2" "3" %}]">'
+        ),
+    ),
+])
+def test_django_full_process(source, expected):
+    """
+    Use the parser with processor management.
+    """
+    parser = MockedHtmlAttributeParser(compatibility="django")
+    filepath, original, modified = parser.process_source("/foo", source)
+
+    assert filepath == "/foo"
+    assert modified == expected

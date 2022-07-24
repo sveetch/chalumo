@@ -61,12 +61,12 @@ def test_get_source_files_pattern(settings):
     ]
 
 
-def test_get_source_contents(settings):
+def test_get_source_contents_pragma(settings):
     """
-    Without a lint tag, every file matching pattern with content starting with lint tag
-    is elligible
+    With a pragma tag, only files with content starting with the pragma tag are
+    elligible.
     """
-    discoverer = HtmlFileDiscovery()
+    discoverer = HtmlFileDiscovery(pragma_tag="{# djlint:on #}")
 
     basepath = settings.fixtures_path / "sample_structure"
 
@@ -89,11 +89,11 @@ def test_get_source_contents(settings):
     ]
 
 
-def test_get_source_contents_notag(settings):
+def test_get_source_contents_nopragma(settings):
     """
-    Without any lint tag, every file matching pattern is elligible
+    Without any pragma tag, every file matching pattern is elligible.
     """
-    discoverer = HtmlFileDiscovery(lint_tag=None)
+    discoverer = HtmlFileDiscovery()
 
     basepath = settings.fixtures_path / "sample_structure"
 

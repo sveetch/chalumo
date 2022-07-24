@@ -15,8 +15,15 @@ from html_classes_linter.logger import init_logger
 from ..diff import HtmlAttributeDiff
 
 
-# Default logger conf
-APP_LOGGER_CONF = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", None)
+# Available logging levels
+APP_LOGGER_CONF = (
+    "DEBUG",
+    "INFO",
+    "WARNING",
+    "ERROR",
+    "CRITICAL",
+    None
+)
 
 
 @click.command()
@@ -32,12 +39,38 @@ APP_LOGGER_CONF = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", None)
     "--mode",
     metavar="STRING",
     type=click.Choice(["lint", "diff", "reformat"]),
+    show_default=True,
     help=(
         "Operation mode to perform. "
-        "'lint' will just perform parse and return problems."
-        "'diff' will output of diff changes for every files with lint issues."
+        "'lint' will just perform parsing and return problems. "
+        "'diff' will output of diff changes for every files with lint issues. "
+        "'reformat' will rewrite sources to fix lint issues."
     ),
     default="diff"
+)
+@click.option(
+    "--require-pragma",
+    metavar="STRING",
+    show_default=True,
+    help=(
+        "Only the files starting with this exact string will be processed and others "
+        "ones will be ignored. For compatibility with 'djLint' environment you should "
+        "use '{# djlint:on #}'."
+    ),
+    default=""
+)
+@click.option(
+    "--profile",
+    metavar="STRING",
+    type=click.Choice(["html", "django"]),
+    show_default=True,
+    help=(
+        "Template profile to use to parse and lint sources. "
+        "'html' (default) won't do anything special since HTML is the basic format. "
+        "'django' enable Django template processors for a workaround with template "
+        "tags. "
+    ),
+    default="html"
 )
 @click.option(
     '-v', '--verbose',
@@ -57,7 +90,7 @@ APP_LOGGER_CONF = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL", None)
     is_flag=True,
     help="Output application version and exit. Other operation modes are ignored."
 )
-def cli_frontend(basepath, mode, verbose, version_mode):
+def cli_frontend(basepath, mode, require_pragma, profile, verbose, version_mode):
     """
     Lint HTML files for messy 'class' attribute contents.
     """
@@ -93,14 +126,15 @@ def cli_frontend(basepath, mode, verbose, version_mode):
         if mode == "lint":
             raise NotImplementedError()
         elif mode == "diff":
-            cleaner = HtmlAttributeDiff()
+            cleaner = HtmlAttributeDiff(pragma_tag=require_pragma, compatibility=profile)
         elif mode == "reformat":
             raise NotImplementedError()
 
         # TODO: Use accurate method following mode option
         logger.info("📂 Opening base directory: {}".format(basepath))
         logger.info("🔧 Using pattern: {}".format(cleaner.file_search_pattern))
-        if cleaner.lint_tag:
-            logger.info("🔧 With starting lint tag: {}".format(cleaner.lint_tag))
+        logger.info("🔧 Profile: {}".format(profile))
+        if cleaner.pragma_tag:
+            logger.info("🔧 Required pragma tag: {}".format(cleaner.pragma_tag))
 
         cleaner.run(basepath)

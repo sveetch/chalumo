@@ -16,13 +16,14 @@ class HtmlFileDiscovery(BaseLogger):
     """
     Search for elligible files which match given rules.
     """
-    DEFAULT_LINT_TAG = "{# djlint:on #}"
+    #DEFAULT_PRAGMA_TAG = "{# djlint:on #}"
+    DEFAULT_PRAGMA_TAG = None
     DEFAULT_FILE_SEARCH_PATTERN = "**/*.html"
 
     def __init__(self, *args, **kwargs):
-        self.lint_tag = self.DEFAULT_LINT_TAG
-        if "lint_tag" in kwargs:
-            self.lint_tag = kwargs.pop("lint_tag")
+        self.pragma_tag = self.DEFAULT_PRAGMA_TAG
+        if "pragma_tag" in kwargs:
+            self.pragma_tag = kwargs.pop("pragma_tag")
 
         self.file_search_pattern = (
             kwargs.pop("file_search_pattern", None) or self.DEFAULT_FILE_SEARCH_PATTERN
@@ -55,12 +56,12 @@ class HtmlFileDiscovery(BaseLogger):
                 # If lint tag is enabled we sniff the file start for expected tag. The
                 # tag must be exactly at the very start of content, nothing before.
                 intro = None
-                if self.lint_tag:
-                    intro = os.pread(f.fileno(), len(self.lint_tag), 0)
+                if self.pragma_tag:
+                    intro = os.pread(f.fileno(), len(self.pragma_tag), 0)
 
                 # Only collect source with the starting lint tag if any is defined,
                 # else every source are collected
-                if not intro or intro.decode("utf-8") == self.lint_tag:
+                if not intro or intro.decode("utf-8") == self.pragma_tag:
                     elligible_files[source] = f.read()
 
         return elligible_files

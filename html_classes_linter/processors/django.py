@@ -2,8 +2,11 @@
 Django processors
 =================
 
+These processors are required to correctly parse Django templates that contain template
+tags which may include double quotes that will disturb parser to get attribute.
+
 Django template pre-processor turns every non text parts into internal references
-so their content never disturb HTML parsing.
+so their content never provoke invalid attribute parsing from parser regex.
 
 By "non text part" we are describing a token that is not a ``TokenType.TEXT``, this
 means template tags (both opener and closer), variable and comment (short format).
@@ -24,7 +27,7 @@ from django.template.base import (
     COMMENT_TAG_START, COMMENT_TAG_END
 )
 
-from .exceptions import PreProcessorError, PostProcessorError
+from ..exceptions import PreProcessorError, PostProcessorError
 
 
 class DjangoPreProcessor:
@@ -34,10 +37,9 @@ class DjangoPreProcessor:
     """
     REFERENCE_SYNTAX = ("⸦⸨⸠", "⸡⸩⸧")
 
-    def __init__(self, source):
-        self.source = source
+    def __init__(self):
         self.reference_syntax = self.REFERENCE_SYNTAX
-        self.isolated_references = {}
+        self.payload = {}
 
     def _get_unique_key(self):
         """
@@ -72,6 +74,9 @@ class DjangoPreProcessor:
                 "Unsupported token type: {}".format(token.token_type.name)
             )
 
+        # NOTE: This does not restore the real original tag form, since it always add
+        # space between tag brackets and its content. However it's not really a real
+        # drawback since this is the way tag should be writted.
         return leading + " " + token.contents + " " + trailing
 
 
@@ -80,7 +85,7 @@ class DjangoPreProcessor:
         Isolate a non text token, aka a tag token (variable, template tag or comment).
 
         Each isolated token content is referenced in instance attribute
-        ``DjangoPreProcessor.isolated_references``.
+        ``DjangoPreProcessor.payload``.
 
         Arguments:
             token (django.template.base.Token): Token to isolate.
@@ -92,7 +97,7 @@ class DjangoPreProcessor:
         tag_id = self._get_unique_key()
 
         # Store content as a reference indexed by its tag
-        self.isolated_references[tag_id] = self._rebuild_token_content(token)
+        self.payload[tag_id] = self._rebuild_token_content(token)
 
         # Return the reference tag
         return (
@@ -119,41 +124,45 @@ class DjangoPreProcessor:
 
         return self._isolate(token)
 
-    def process(self):
+    def process(self, source):
         """
         Process to non text parts isolation.
 
         Don't try to use ``render`` method after this one since the reference ids will
         never be the same twice.
 
+        Arguments:
+            source (string): Source content to process.
+
         Returns:
             list: List of resolved token as strings.
         """
-        tokens = Lexer(self.source).tokenize()
+        tokens = Lexer(source).tokenize()
 
         return [self._resolve_item(token) for token in tokens]
 
-    def render(self):
+    def render(self, source):
         """
         Render processed content with isolated parts.
 
         Don't try to use ``process`` method after this one since the reference ids will
         never be the same twice.
 
+        Arguments:
+            source (string): Source content to process.
+
         Returns:
             string: Rendered content.
         """
-        return "".join(self.process())
+        return "".join(self.process(source))
 
 
 class DjangoPostProcessor:
     """
     Restore original isolated content in place of their reference.
     """
-    def __init__(self, source, isolated_references, reference_syntax):
-        self.source = source
-        self.isolated_references = isolated_references
-
+    def __init__(self, reference_syntax):
+        self.payload = None
         self.reference_syntax = reference_syntax
         self.reference_pattern = r"({start}).+?({end})".format(
             start=self.reference_syntax[0],
@@ -167,26 +176,32 @@ class DjangoPostProcessor:
 
         Arguments:
             matchobj (re.Match): The match object to get the reference ID to get
-                its content from store in ``isolated_references`` attribute.
+                its content from store in ``payload`` attribute.
 
         Returns:
             string: Reference content.
         """
         tag_id = matchobj.group(0)[len(self.reference_syntax[0]):-len(self.reference_syntax[1])]
 
-        if tag_id not in self.isolated_references:
+        if tag_id not in self.payload:
             # Better exception with a message
             raise PostProcessorError(
                 "Found unknow reference identifier: {}".format(tag_id)
             )
 
-        return self.isolated_references[tag_id]
+        return self.payload[tag_id]
 
-    def render(self):
+    def render(self, source, payload):
         """
         Render processed content with isolated parts.
+
+        Arguments:
+            source (string): Source content to process.
+            payload (dict): Reference store as created in ``DjangoPreProcessor``
+                instance attribute.
 
         Returns:
             string: Rendered content.
         """
-        return self.reference_regex.sub(self._reference_restorer, self.source)
+        self.payload = payload
+        return self.reference_regex.sub(self._reference_restorer, source)

@@ -9,28 +9,19 @@ import re
 
 from pathlib import Path
 
-from .logger import BaseLogger
-
 from .exceptions import ParserError
+from .logger import BaseLogger
+from .processors import ProcessorManager
 
 
-class HtmlAttributeParser(BaseLogger):
+class HtmlAttributeParser(ProcessorManager, BaseLogger):
     """
     Basic HTML parser to get attributes and clean their values.
 
     This is a basic implementation which does not apply any rule, however it contains
     some rule methods to use in further parser implementations.
     """
-    DEFAULT_DJANGO_COMPAT = True
-
     def __init__(self, *args, **kwargs):
-        # Enable Django template compatibility to play nice with template tags and
-        # variables which could include double quotes that will disturb attribute
-        # matching. Enabled by default.
-        self.django_compat = self.DEFAULT_DJANGO_COMPAT
-        if "django_compat" in kwargs:
-            self.django_compat = kwargs.pop("django_compat")
-
         # Attribute name to search for in HTML, default to ``class``.
         self.attribute_name = kwargs.pop("attribute_name", None) or "class"
 
@@ -146,13 +137,13 @@ class HtmlAttributeParser(BaseLogger):
             self.attribute_end
         )
 
-    def process_source(self, filepath, content):
+    def process_source(self, filepath, source):
         """
         Parse a source for attribute value.
 
         Arguments:
             filepath (pathlib.Path): Source file path.
-            content (string): Source content.
+            source (string): Source content.
 
         Returns:
             tuple: A tuple for processed source where
@@ -166,8 +157,14 @@ class HtmlAttributeParser(BaseLogger):
 
         return (
             filepath,
-            content,
-            self.attribute_regex.sub(self.attribute_cleaner, content)
+            source,
+            self.post_processor.render(
+                self.attribute_regex.sub(
+                    self.attribute_cleaner,
+                    self.pre_processor.render(source)
+                ),
+                self.pre_processor.payload
+            )
         )
 
     def batch_sources(self, sources):
