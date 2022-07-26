@@ -167,7 +167,7 @@ class HtmlAttributeParser(ProcessorManager, BaseLogger):
             )
         )
 
-    def batch_sources(self, sources):
+    def parse_sources(self, sources):
         """
         Batch cleaning process on all given source contents.
 

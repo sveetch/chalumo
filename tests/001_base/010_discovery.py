@@ -32,7 +32,7 @@ def test_get_source_files(settings):
     ]
 
 
-def test_get_source_files_pattern(settings):
+def test_get_source_files_pattern_all_files(settings):
     """
     With a pattern to match every files
     """
@@ -59,6 +59,26 @@ def test_get_source_files_pattern(settings):
         "subdir_2/notag_zip.html",
         "subdir_2/subdir_2_1/zap.html"
     ]
+
+
+def test_get_source_files_single_file(settings):
+    """
+    Discovery should accept also a single file path instead of a directory base path,
+    in this case it will disable the glob pattern.
+    """
+    # Use a pattern that won't match any template if glob pattern was enabled
+    discoverer = HtmlFileDiscovery(file_search_pattern="**/*.txt")
+
+    basepath = settings.fixtures_path / "sample_structure" / "basic.html"
+
+    # We don't use relative path since basepath is the file path and it would resume
+    # to "."
+    sources = [
+        str(basepath.name)
+        for item in discoverer.get_source_files(basepath)
+    ]
+
+    assert sources == ["basic.html"]
 
 
 def test_get_source_contents_pragma(settings):

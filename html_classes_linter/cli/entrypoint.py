@@ -30,7 +30,7 @@ APP_LOGGER_CONF = (
 @click.argument(
     "basepath",
     type=click.Path(
-        file_okay=False, dir_okay=True, writable=True, resolve_path=True,
+        file_okay=True, dir_okay=True, writable=True, resolve_path=False,
         path_type=Path, exists=True,
     ),
     required=False,
