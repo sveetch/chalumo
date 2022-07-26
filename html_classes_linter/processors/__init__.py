@@ -38,7 +38,7 @@ class DummyPostProcessor:
 
 class ProcessorManager(BaseLogger):
     """
-    Implement management of pre and post processor for content.
+    Implement management of pre and post processors for content.
     """
     def __init__(self, *args, **kwargs):
         # Enable compatibility to play with a specific format.

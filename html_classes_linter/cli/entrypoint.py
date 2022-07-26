@@ -73,6 +73,16 @@ APP_LOGGER_CONF = (
     default="html"
 )
 @click.option(
+    "--pattern",
+    metavar="STRING",
+    show_default=True,
+    help=(
+        "Pattern to use for file discovery in given basepath. If given basepath is"
+        "a single file path, the pattern is not used."
+    ),
+    default=""
+)
+@click.option(
     '-v', '--verbose',
     type=click.IntRange(min=0, max=5),
     show_default=True,
@@ -90,9 +100,12 @@ APP_LOGGER_CONF = (
     is_flag=True,
     help="Output application version and exit. Other operation modes are ignored."
 )
-def cli_frontend(basepath, mode, require_pragma, profile, verbose, version_mode):
+def cli_frontend(basepath, mode, require_pragma, profile, pattern, verbose,
+                 version_mode):
     """
-    Lint HTML files for messy 'class' attribute contents.
+    Diff, lint or reformat files for messy 'class' attribute contents from a given
+    basepath. The basepath argument may be a directory to recursively search or a
+    single file path.
     """
     printout = True
     if verbose == 0:
@@ -131,7 +144,10 @@ def cli_frontend(basepath, mode, require_pragma, profile, verbose, version_mode)
             raise NotImplementedError()
 
         # TODO: Use accurate method following mode option
-        logger.info("📂 Opening base directory: {}".format(basepath))
+        if basepath.is_file():
+            logger.info("📂 Opening single file: {}".format(basepath))
+        else:
+            logger.info("📂 Opening base directory: {}".format(basepath))
         logger.info("🔧 Using pattern: {}".format(cleaner.file_search_pattern))
         logger.info("🔧 Profile: {}".format(profile))
         if cleaner.pragma_tag:

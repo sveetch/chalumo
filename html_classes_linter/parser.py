@@ -1,8 +1,11 @@
 """
-HTML Attribute parser
-=====================
+Attribute parser
+================
 
-The parser will search in files for seeked HTML attribute.
+The parser will search in content for seeked HTML attribute. Even it does not change
+anything in content, the parser contains everything to apply lint rules.
+
+Parser always expect attribute to be quoted with ``"`` since it is the way.
 
 """
 import re
@@ -18,8 +21,9 @@ class HtmlAttributeParser(ProcessorManager, BaseLogger):
     """
     Basic HTML parser to get attributes and clean their values.
 
-    This is a basic implementation which does not apply any rule, however it contains
-    some rule methods to use in further parser implementations.
+    Keywords Arguments:
+        attribute_name (string): The attribute name to search for. Default to
+            ``class``.
     """
     def __init__(self, *args, **kwargs):
         # Attribute name to search for in HTML, default to ``class``.

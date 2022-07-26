@@ -11,6 +11,10 @@ from .parser import HtmlAttributeParser
 class HtmlAttributeFix(HtmlAttributeParser):
     """
     Implement the attribute value fixes for rules on contents.
+
+    Keywords Arguments:
+        enabled_rules (list): List of parser rule names to enable for fixes. Default to
+            all available parser rules.
     """
     DEFAULT_ENABLED_RULES = ("H050", "H051")
 

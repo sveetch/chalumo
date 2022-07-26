@@ -60,6 +60,9 @@ class DjangoPreProcessor:
         Django template lexer is stripping leading and trailing tag syntax, so we need
         to add them again before to store it.
 
+        Arguments:
+            token (django.template.base.Token): Token to isolate.
+
         Returns:
             string: Rebuilded content.
         """

@@ -78,6 +78,9 @@ class HtmlAttributeDiff(HtmlAttributeFix, HtmlFileDiscovery):
         Produce a diff of cleaning operation for all allowed files in given basepath.
 
         Diff output mentions file paths as relative to the basepath.
+
+        Arguments:
+            basepath (pathlib.Path): Base path where to search for sources.
         """
         cwd = Path.cwd()
 
