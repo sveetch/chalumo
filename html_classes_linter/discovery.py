@@ -7,12 +7,10 @@ This implement everything to search for elligible HTML files.
 """
 import os
 
-from pathlib import Path
-
 from .logger import BaseLogger
 
 
-class HtmlFileDiscovery(BaseLogger):
+class SourceDiscovery(BaseLogger):
     """
     Implement the way to discover source files.
 
@@ -64,8 +62,8 @@ class HtmlFileDiscovery(BaseLogger):
         If pragma tag have been given, only files starting with it are elligible. Else
         all given files are elligible.
 
-        Allowed files must starts the possible pragma tag if defined else all given files
-        are validated as elligible.
+        Allowed files must starts the possible pragma tag if defined else all given
+        files are validated as elligible.
 
         Arguments:
             sources (list): A list of Path objects for files to validate eligibility.

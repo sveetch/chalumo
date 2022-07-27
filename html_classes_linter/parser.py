@@ -10,8 +10,6 @@ Parser always expect attribute to be quoted with ``"`` since it is the way.
 """
 import re
 
-from pathlib import Path
-
 from .exceptions import ParserError
 from .logger import BaseLogger
 from .processors import ProcessorManager

@@ -1,15 +1,11 @@
-import json
-
-import pytest
-
-from html_classes_linter.discovery import HtmlFileDiscovery
+from html_classes_linter.discovery import SourceDiscovery
 
 
 def test_get_source_files(settings):
     """
     With default pattern to get only HTML files
     """
-    discoverer = HtmlFileDiscovery()
+    discoverer = SourceDiscovery()
 
     basepath = settings.fixtures_path / "sample_structure"
 
@@ -18,7 +14,7 @@ def test_get_source_files(settings):
         for item in discoverer.get_source_files(basepath)
     ])
 
-    #print(json.dumps(sources, indent=4))
+    # print(json.dumps(sources, indent=4))
 
     assert sources == [
         "basic.html",
@@ -36,7 +32,7 @@ def test_get_source_files_pattern_all_files(settings):
     """
     With a pattern to match every files
     """
-    discoverer = HtmlFileDiscovery(file_search_pattern="**/*.*")
+    discoverer = SourceDiscovery(file_search_pattern="**/*.*")
 
     basepath = settings.fixtures_path / "sample_structure"
 
@@ -45,7 +41,7 @@ def test_get_source_files_pattern_all_files(settings):
         for item in discoverer.get_source_files(basepath)
     ])
 
-    #print(json.dumps(sources, indent=4))
+    # print(json.dumps(sources, indent=4))
 
     assert sources == [
         "basic.html",
@@ -67,7 +63,7 @@ def test_get_source_files_single_file(settings):
     in this case it will disable the glob pattern.
     """
     # Use a pattern that won't match any template if glob pattern was enabled
-    discoverer = HtmlFileDiscovery(file_search_pattern="**/*.txt")
+    discoverer = SourceDiscovery(file_search_pattern="**/*.txt")
 
     basepath = settings.fixtures_path / "sample_structure" / "basic.html"
 
@@ -86,7 +82,7 @@ def test_get_source_contents_pragma(settings):
     With a pragma tag, only files with content starting with the pragma tag are
     elligible.
     """
-    discoverer = HtmlFileDiscovery(pragma_tag="{# djlint:on #}")
+    discoverer = SourceDiscovery(pragma_tag="{# djlint:on #}")
 
     basepath = settings.fixtures_path / "sample_structure"
 
@@ -97,7 +93,7 @@ def test_get_source_contents_pragma(settings):
         for filepath, content in discoverer.get_source_contents(found).items()
     ])
 
-    #print(json.dumps(sources, indent=4))
+    # print(json.dumps(sources, indent=4))
 
     assert sources == [
         "basic.html",
@@ -113,7 +109,7 @@ def test_get_source_contents_nopragma(settings):
     """
     Without any pragma tag, every file matching pattern is elligible.
     """
-    discoverer = HtmlFileDiscovery()
+    discoverer = SourceDiscovery()
 
     basepath = settings.fixtures_path / "sample_structure"
 
@@ -124,7 +120,7 @@ def test_get_source_contents_nopragma(settings):
         for filepath, content in discoverer.get_source_contents(found).items()
     ])
 
-    #print(json.dumps(sources, indent=4))
+    # print(json.dumps(sources, indent=4))
 
     assert sources == [
         "basic.html",

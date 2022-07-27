@@ -1,10 +1,3 @@
-"""
-Work In Progress
-
-There is some R&D stuff to remove once finished.
-"""
-from pathlib import Path
-
 import pytest
 
 from html_classes_linter.parser import HtmlAttributeParser
@@ -12,11 +5,7 @@ from html_classes_linter.processors.django import (
     DjangoPreProcessor, DjangoPostProcessor,
 )
 
-from django.template.base import (
-    Lexer, TokenType,
-    BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END,
-    COMMENT_TAG_START, COMMENT_TAG_END
-)
+from django.template.base import Lexer, TokenType
 
 
 class MockedHtmlAttributeParser(HtmlAttributeParser):
@@ -54,17 +43,17 @@ def test_django_template_parser():
     """
     source = (
         '<div class="'
-            'foo'
-            '{% if foo == "" %}'
-                ' plop'
-                '{% if bar == "" %}'
-                    ' plop'
-                '{% endif %}'
-            '{%else%}'
-                ' {{ foo }} {{ bar }}'
-                '{% include "something.html" %}'
-                '{# nope #}'
-            '{% endif %}'
+        'foo'
+        '{% if foo == "" %}'
+        ' plop'
+        '{% if bar == "" %}'
+        ' plop'
+        '{% endif %}'
+        '{%else%}'
+        ' {{ foo }} {{ bar }}'
+        '{% include "something.html" %}'
+        '{# nope #}'
+        '{% endif %}'
         '">Lorem ipsum</div>'
     )
     tokens = Lexer(source).tokenize()

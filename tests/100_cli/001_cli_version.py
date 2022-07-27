@@ -11,8 +11,6 @@ def test_version_ping(caplog):
 
     result = runner.invoke(cli_frontend, ["--version"])
 
-    #print(result.output)
-
     assert result.exit_code == 0
 
     assert caplog.record_tuples == []

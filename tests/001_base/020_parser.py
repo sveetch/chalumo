@@ -1,10 +1,5 @@
-import json
-
-from pathlib import Path
-
 import pytest
 
-from html_classes_linter.discovery import HtmlFileDiscovery
 from html_classes_linter.exceptions import ParserError
 from html_classes_linter.parser import HtmlAttributeParser
 
@@ -61,7 +56,7 @@ def test_get_attribute_value_error(settings, content, attribute_name, expected):
     parser = HtmlAttributeParser(**kwargs)
 
     with pytest.raises(ParserError):
-        value = parser.get_attribute_value(MatchObject(content))
+        parser.get_attribute_value(MatchObject(content))
 
 
 @pytest.mark.parametrize("content, attribute_name, expected", [

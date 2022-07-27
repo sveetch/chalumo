@@ -82,7 +82,6 @@ class DjangoPreProcessor:
         # drawback since this is the way tag should be writted.
         return leading + " " + token.contents + " " + trailing
 
-
     def _isolate(self, token):
         """
         Isolate a non text token, aka a tag token (variable, template tag or comment).
@@ -184,7 +183,9 @@ class DjangoPostProcessor:
         Returns:
             string: Reference content.
         """
-        tag_id = matchobj.group(0)[len(self.reference_syntax[0]):-len(self.reference_syntax[1])]
+        # Remove tag syntax from matched content
+        tag_id = matchobj.group(0)
+        tag_id = tag_id[len(self.reference_syntax[0]):-len(self.reference_syntax[1])]
 
         if tag_id not in self.payload:
             # Better exception with a message

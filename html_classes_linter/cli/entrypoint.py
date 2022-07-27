@@ -139,7 +139,10 @@ def cli_frontend(basepath, mode, require_pragma, profile, pattern, verbose,
         if mode == "lint":
             raise NotImplementedError()
         elif mode == "diff":
-            cleaner = HtmlAttributeDiff(pragma_tag=require_pragma, compatibility=profile)
+            cleaner = HtmlAttributeDiff(
+                pragma_tag=require_pragma,
+                compatibility=profile
+            )
         elif mode == "reformat":
             raise NotImplementedError()
 

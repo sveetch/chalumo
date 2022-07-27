@@ -7,13 +7,12 @@ rules.
 
 """
 import difflib
-from pathlib import Path
 
-from .discovery import HtmlFileDiscovery
-from .reformat import HtmlAttributeFix
+from .discovery import SourceDiscovery
+from .reformat import SourceFixer
 
 
-class HtmlAttributeDiff(HtmlAttributeFix, HtmlFileDiscovery):
+class HtmlAttributeDiff(SourceFixer, SourceDiscovery):
     """
     Create a diff output with unified context for content changes for each file.
 
@@ -82,8 +81,6 @@ class HtmlAttributeDiff(HtmlAttributeFix, HtmlFileDiscovery):
         Arguments:
             basepath (pathlib.Path): Base path where to search for sources.
         """
-        cwd = Path.cwd()
-
         for filepath, from_source, to_source in self.apply_fixes(basepath):
             diff_lines = list(
                 self.diff_source(filepath, from_source, to_source)

@@ -1,10 +1,6 @@
-import json
-
-from pathlib import Path
-
 import pytest
 
-from html_classes_linter.reformat import HtmlAttributeFix
+from html_classes_linter.reformat import SourceFixer
 
 
 class MatchObject:
@@ -20,6 +16,7 @@ class MatchObject:
         """
         return self.content
 
+
 @pytest.mark.skip("TODO")
 @pytest.mark.parametrize("content, attribute_name, expected", [
     (
@@ -30,13 +27,13 @@ class MatchObject:
 ])
 def test_get_attribute_value(settings, content, attribute_name, expected):
     """
-    TODO: Dummy sample to adapt to fully cover HtmlAttributeFix
+    TODO: Dummy sample to adapt to fully cover SourceFixer
     """
     kwargs = {}
     if attribute_name:
         kwargs["attribute_name"] = attribute_name
 
-    parser = HtmlAttributeFix(**kwargs)
+    parser = SourceFixer(**kwargs)
 
     value = parser.get_attribute_value(MatchObject(content))
 
