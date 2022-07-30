@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-import html_classes_linter
+import chalumo
 
 
 class FixturesSettingsTestMixin(object):
@@ -23,7 +23,7 @@ class FixturesSettingsTestMixin(object):
     """
     def __init__(self):
         self.application_path = Path(
-            html_classes_linter.__file__
+            chalumo.__file__
         ).parents[0].resolve()
 
         self.package_path = self.application_path.parent
@@ -50,7 +50,7 @@ class FixturesSettingsTestMixin(object):
             APPLICATION=str(self.application_path),
             TESTS=str(self.tests_path),
             FIXTURES=str(self.fixtures_path),
-            VERSION=html_classes_linter.__version__,
+            VERSION=chalumo.__version__,
         )
 
 

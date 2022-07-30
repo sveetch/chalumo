@@ -2,7 +2,7 @@ import shutil
 
 from pathlib import Path
 
-from html_classes_linter.reformat import SourceWriter
+from chalumo.reformat import SourceWriter
 
 
 def test_reformat_run(settings, tmp_path):

@@ -1,4 +1,4 @@
-from html_classes_linter.discovery import SourceDiscovery
+from chalumo.discovery import SourceDiscovery
 
 
 def test_get_source_files(settings):

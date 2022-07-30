@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from html_classes_linter.diff import SourceDiff
+from chalumo.diff import SourceDiff
 
 
 class MockedSourceDiff(SourceDiff):

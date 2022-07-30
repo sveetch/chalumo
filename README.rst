@@ -2,9 +2,9 @@
 .. _Django: https://www.djangoproject.com/
 .. _Click: https://click.palletsprojects.com
 
-===================
-HTML classes linter
-===================
+=============================
+Chalumo - a HTML class linter
+=============================
 
 A simple script to lint, diff or reformat HTML 'class' attribute values
 
@@ -18,6 +18,6 @@ Dependancies
 Links
 *****
 
-* (Not yet published) Read the documentation on `Read the docs <https://html-classes-linter.readthedocs.io/>`_;
-* (Not yet released) Download its `PyPi package <https://pypi.python.org/pypi/html-classes-linter>`_;
-* Clone it on its `Github repository <https://github.com/sveetch/html-classes-linter>`_;
+* (Not yet published) Read the documentation on `Read the docs <https://chalumo.readthedocs.io/>`_;
+* (Not yet released) Download its `PyPi package <https://pypi.python.org/pypi/chalumo>`_;
+* Clone it on its `Github repository <https://github.com/sveetch/chalumo>`_;

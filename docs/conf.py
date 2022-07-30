@@ -12,19 +12,19 @@
 #
 
 # Get the module version
-from html_classes_linter import __version__ as html_classes_linter_version
+from chalumo import __version__ as chalumo_version
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'html-classes-linter'
+project = 'Chalumo'
 copyright = '2022, David Thenon'
 author = 'David Thenon'
 
 # The short X.Y version
-version = html_classes_linter_version
+version = chalumo_version
 # The full version, including alpha/beta/rc tags
-release = html_classes_linter_version
+release = chalumo_version
 
 
 # -- General configuration ---------------------------------------------------

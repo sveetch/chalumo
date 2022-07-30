@@ -19,7 +19,7 @@ class HtmlAttributeParser(ProcessorManager, BaseLogger):
     """
     Parser to get attributes from HTML source and clean their values.
 
-    Keywords Arguments:
+    Keyword Arguments:
         attribute_name (string): The attribute name to search for. Default to
             ``class``.
     """

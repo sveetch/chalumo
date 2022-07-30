@@ -1,3 +1,21 @@
+"""
+Content processors
+==================
+
+Processors implement pre and post operations to enable compatibility with some template
+formats.
+
+There is currently only two available formats:
+
+HTML
+    This is the default format. It does not implement any real processors since
+    it's the default format.
+
+Django
+    Implement a pre processor to isolate every template tag and post processor to
+    restore them.
+
+"""
 from ..logger import BaseLogger
 from .django import DjangoPreProcessor, DjangoPostProcessor
 

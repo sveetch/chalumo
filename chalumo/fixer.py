@@ -12,7 +12,7 @@ class SourceFixer(HtmlAttributeParser):
     """
     Apply the parser rules on source contents.
 
-    Keywords Arguments:
+    Keyword Arguments:
         enabled_rules (list): List of parser rule names to enable for fixes. Default to
             all available parser rules.
     """

@@ -39,14 +39,14 @@ server.watch(
 
 # Watch Python modules for autodoc review
 server.watch(
-    "html_classes_linter/*.py",
+    "chalumo/*.py",
     shell(
         "make html",
         cwd="docs"
     )
 )
 server.watch(
-    "html_classes_linter/*/**.py",
+    "chalumo/*/**.py",
     shell(
         "make html",
         cwd="docs"

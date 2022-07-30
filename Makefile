@@ -7,9 +7,9 @@ SPHINX_RELOAD=$(VENV_PATH)/bin/python sphinx_reload.py
 TOX=$(VENV_PATH)/bin/tox
 TWINE=$(VENV_PATH)/bin/twine
 
-PACKAGE_NAME=html-classes-linter
+PACKAGE_NAME=chalumo
 PACKAGE_SLUG=`echo $(PACKAGE_NAME) | tr '-' '_'`
-APPLICATION_NAME=html_classes_linter
+APPLICATION_NAME=chalumo
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"

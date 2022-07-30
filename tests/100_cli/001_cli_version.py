@@ -1,6 +1,6 @@
 from click.testing import CliRunner
 
-from html_classes_linter.cli.entrypoint import cli_frontend
+from chalumo.cli.entrypoint import cli_frontend
 
 
 def test_version_ping(caplog):

@@ -14,11 +14,11 @@ class SourceDiscovery(BaseLogger):
     """
     Implement the way to discover source files.
 
-    Keywords Arguments:
-        pragma_tag (string): Only files starting with string will be considered
-            elligible if this argument is not empty else every found file is
-            elligible. You should always something neutral like a comment, in Django
-            template a good choice would be ``{# djlint:on #}`` (so it work in
+    Keyword Arguments:
+        pragma_tag (string): Only files starting with this string will be considered
+            elligible. If this argument is empty every found files are elligibles. You
+            should always use something neutral like a comment tag. In Django
+            template a good choice would be ``{# djlint:on #}`` (so it will work in
             combination with djLint).
         file_search_pattern (string): A glob pattern to use to search for files. Default
             to ``**/*.html`` to only match HTML files. Use ``**/*.*`` if you want to

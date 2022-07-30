@@ -1,7 +1,7 @@
 import pytest
 
-from html_classes_linter.exceptions import ParserError
-from html_classes_linter.parser import HtmlAttributeParser
+from chalumo.exceptions import ParserError
+from chalumo.parser import HtmlAttributeParser
 
 
 class MatchObject:

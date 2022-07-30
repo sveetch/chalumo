@@ -17,7 +17,7 @@ Development
 Development requirements
 ************************
 
-html-classes-linter is developed with:
+chalumo is developed with:
 
 * *Test Development Driven* (TDD) using `Pytest`_;
 * Respecting flake and pip8 rules using `Flake8`_;
@@ -36,11 +36,11 @@ Install for development
 First ensure you have `pip`_ and `virtualenv`_ packages installed then
 type: ::
 
-    git clone https://github.com/sveetch/html-classes-linter.git
-    cd html-classes-linter
+    git clone https://github.com/sveetch/chalumo.git
+    cd chalumo
     make install
 
-html-classes-linter will be installed in editable mode from the
+chalumo will be installed in editable mode from the
 latest commit on master branch with some development tools.
 
 Unittests

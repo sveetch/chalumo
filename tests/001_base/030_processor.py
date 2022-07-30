@@ -1,7 +1,7 @@
 import pytest
 
-from html_classes_linter.parser import HtmlAttributeParser
-from html_classes_linter.processors.django import (
+from chalumo.parser import HtmlAttributeParser
+from chalumo.processors.django import (
     DjangoPreProcessor, DjangoPostProcessor,
 )
 

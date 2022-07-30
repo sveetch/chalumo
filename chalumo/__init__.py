@@ -21,7 +21,7 @@ def _extract_version(package_name):
     return _conf["metadata"]["version"]
 
 
-__pkgname__ = "html-classes-linter"
+__pkgname__ = "chalumo"
 
 
 __version__ = _extract_version(__pkgname__)
