@@ -17,7 +17,7 @@ from .processors import ProcessorManager
 
 class HtmlAttributeParser(ProcessorManager, BaseLogger):
     """
-    Basic HTML parser to get attributes and clean their values.
+    Parser to get attributes from HTML source and clean their values.
 
     Keywords Arguments:
         attribute_name (string): The attribute name to search for. Default to

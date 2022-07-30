@@ -48,3 +48,21 @@ class SourceFixer(HtmlAttributeParser):
             items = self.apply_rule_H051(items)
 
         return " ".join(items)
+
+    def apply_fixes(self, basepath):
+        """
+        Run cleaning on allowed source files from basepath and return original and
+        modified contents.
+
+        Arguments:
+            basepath (pathlib.Path): Base path where to search for sources.
+
+        Returns:
+            list: List of tuple (for path, original and modified content) as returned
+                from ``HtmlAttributeParser.process_source``
+        """
+        return self.parse_sources(
+            self.get_source_contents(
+                self.get_source_files(basepath)
+            )
+        )

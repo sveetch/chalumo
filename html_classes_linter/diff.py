@@ -9,10 +9,10 @@ rules.
 import difflib
 
 from .discovery import SourceDiscovery
-from .reformat import SourceFixer
+from .fixer import SourceFixer
 
 
-class HtmlAttributeDiff(SourceFixer, SourceDiscovery):
+class SourceDiff(SourceFixer, SourceDiscovery):
     """
     Create a diff output with unified context for content changes for each file.
 
@@ -52,24 +52,6 @@ class HtmlAttributeDiff(SourceFixer, SourceDiscovery):
             str(filepath),
             str(filepath),
             n=self.DIFF_CONTEXT_LINES,
-        )
-
-    def apply_fixes(self, basepath):
-        """
-        Run cleaning on allowed source files from basepath and return original and
-        modified contents.
-
-        Arguments:
-            basepath (pathlib.Path): Base path where to search for sources.
-
-        Returns:
-            list: List of tuple (for path, original and modified content) as returned
-                from ``HtmlAttributeParser.process_source``
-        """
-        return self.parse_sources(
-            self.get_source_contents(
-                self.get_source_files(basepath)
-            )
         )
 
     def run(self, basepath):

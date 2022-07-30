@@ -8,11 +8,9 @@ from pathlib import Path
 
 import click
 
-from html_classes_linter import __pkgname__, __version__
-
-from html_classes_linter.logger import init_logger
-
-from ..diff import HtmlAttributeDiff
+from .. import __pkgname__, __version__
+from ..logger import init_logger
+from ..diff import SourceDiff
 
 
 # Available logging levels
@@ -139,7 +137,7 @@ def cli_frontend(basepath, mode, require_pragma, profile, pattern, verbose,
         if mode == "lint":
             raise NotImplementedError()
         elif mode == "diff":
-            cleaner = HtmlAttributeDiff(
+            cleaner = SourceDiff(
                 pragma_tag=require_pragma,
                 compatibility=profile
             )

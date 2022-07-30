@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from html_classes_linter.diff import HtmlAttributeDiff
+from html_classes_linter.diff import SourceDiff
 
 
-class MockedHtmlAttributeDiff(HtmlAttributeDiff):
+class MockedSourceDiff(SourceDiff):
     """
     Mocked version for test purpose
     """
@@ -17,7 +17,7 @@ class MockedHtmlAttributeDiff(HtmlAttributeDiff):
         self.echo = self.store_output
 
     def store_output(self, content=""):
-        print(content)
+        # print(content)
         self.mocked_output.append(content)
 
 
@@ -37,7 +37,7 @@ def test_diff_source(filepath, from_source, to_source, expected_from, expected_t
     """
     Method diff_source should return a generator for diff output lines as expected.
     """
-    differ = HtmlAttributeDiff()
+    differ = SourceDiff()
 
     result = list(
         differ.diff_source(filepath, from_source, to_source)
@@ -104,10 +104,11 @@ def test_diff_source(filepath, from_source, to_source, expected_from, expected_t
 ])
 def test_diff_run(settings, sourcepath, expected):
     """
-
+    Running diff on sources should output a correct unified diff for changes from
+    rules applications.
     """
     # Use pragma tag to limit output
-    differ = MockedHtmlAttributeDiff(pragma_tag="{# djlint:on #}")
+    differ = MockedSourceDiff(pragma_tag="{# djlint:on #}")
 
     basepath = settings.fixtures_path / sourcepath
 
