@@ -10,6 +10,7 @@ from chalumo.logger import init_logger
 
 from .version import version_command
 from .diff import diff_command
+from .reformat import reformat_command
 
 
 # Help alias on "-h" argument
@@ -42,7 +43,7 @@ APP_LOGGER_CONF = (
 @click.pass_context
 def cli_frontend(ctx, verbose):
     """
-    Sample tool for chalumo
+    Chalumo - a HTML class linter
     """
     printout = True
     if verbose == 0:
@@ -69,3 +70,4 @@ def cli_frontend(ctx, verbose):
 # Attach commands methods to the main grouper
 cli_frontend.add_command(version_command, name="version")
 cli_frontend.add_command(diff_command, name="diff")
+cli_frontend.add_command(reformat_command, name="reformat")

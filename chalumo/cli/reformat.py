@@ -6,7 +6,7 @@ import click
 
 from .. import __pkgname__, __version__
 from ..logger import init_logger
-from ..diff import SourceDiff
+from ..reformat import SourceWriter
 
 from .base import COMMON_ARGS, COMMON_OPTIONS
 
@@ -26,20 +26,18 @@ from .base import COMMON_ARGS, COMMON_OPTIONS
     **COMMON_OPTIONS["pattern"]["kwargs"]
 )
 @click.pass_context
-def diff_command(context, basepath, profile, require_pragma, pattern):
+def reformat_command(context, basepath, profile, require_pragma, pattern):
     """
-    Apply rules fixes on discovered files then output a diff between original and fixed
-    sources.
+    Rewrite sources with applied rules fixes on discovered files.
 
     The basepath argument may be a directory to recursively search or a single file
     path.
     """
     logger = logging.getLogger("chalumo")
 
-    cleaner = SourceDiff(
+    cleaner = SourceWriter(
         pragma_tag=require_pragma,
-        compatibility=profile,
-        output_callable=click.echo,
+        compatibility=profile
     )
 
     if basepath.is_file():
