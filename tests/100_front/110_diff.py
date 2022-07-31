@@ -65,7 +65,6 @@ def test_diff_source(filepath, from_source, to_source, expected_from, expected_t
             '     </div>',
             ' </div>',
             '',
-            '',
             '--- {FIXTURES}/sample_structure/subdir_1/subdir_1_1/pong.html',
             '+++ {FIXTURES}/sample_structure/subdir_1/subdir_1_1/pong.html',
             '@@ -1,7 +1,7 @@',
@@ -79,7 +78,6 @@ def test_diff_source(filepath, from_source, to_source, expected_from, expected_t
             '     </div>',
             ' </div>',
             '',
-            ''
         ],
     ),
     (
@@ -98,7 +96,6 @@ def test_diff_source(filepath, from_source, to_source, expected_from, expected_t
             '     </div>',
             ' </div>',
             '',
-            ''
         ],
     ),
 ])

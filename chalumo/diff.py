@@ -56,9 +56,8 @@ class SourceDiff(SourceFixer, SourceDiscovery):
 
     def run(self, basepath):
         """
-        Produce a diff of cleaning operation for all allowed files in given basepath.
-
-        Diff output mentions file paths as relative to the basepath.
+        Output a diff of cleaning operations for all discovered files from given
+        basepath.
 
         Arguments:
             basepath (pathlib.Path): Base path where to search for sources.
@@ -70,4 +69,3 @@ class SourceDiff(SourceFixer, SourceDiscovery):
 
             if len(diff_lines) > 0:
                 self.echo("".join(diff_lines))
-                self.echo()
