@@ -8,7 +8,8 @@ Version 0.4.0 - Unreleased
 --------------------------
 
 * Renamed project from "html-classes-linter" to "chalumo";
-* Finished reformater class;
+* Finished reformater class with test and CLI interface;
+* Some code refactoring;
 
 
 Version 0.3.0 - Unreleased
