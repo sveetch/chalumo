@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-from pathlib import Path
 
 import click
 
-from .. import __pkgname__, __version__
-from ..logger import init_logger
 from ..diff import SourceDiff
 
 from .base import COMMON_ARGS, COMMON_OPTIONS
@@ -40,6 +37,7 @@ def diff_command(context, basepath, profile, require_pragma, pattern):
         pragma_tag=require_pragma,
         compatibility=profile,
         output_callable=click.echo,
+        file_search_pattern=pattern,
     )
 
     if basepath.is_file():

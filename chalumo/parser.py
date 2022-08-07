@@ -108,7 +108,7 @@ class HtmlAttributeParser(ProcessorManager, BaseLogger):
         if not matchobj.group(0):
             raise ParserError("There is a empty matched object")
 
-        if(
+        if (
             not matchobj.group(0).startswith(self.attribute_start) or
             not matchobj.group(0).endswith(self.attribute_end)
         ):

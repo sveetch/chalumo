@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-from pathlib import Path
 
 import click
 
-from .. import __pkgname__, __version__
-from ..logger import init_logger
 from ..reformat import SourceWriter
 
 from .base import COMMON_ARGS, COMMON_OPTIONS
@@ -37,7 +34,8 @@ def reformat_command(context, basepath, profile, require_pragma, pattern):
 
     cleaner = SourceWriter(
         pragma_tag=require_pragma,
-        compatibility=profile
+        compatibility=profile,
+        file_search_pattern=pattern,
     )
 
     if basepath.is_file():

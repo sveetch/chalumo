@@ -13,8 +13,6 @@ def test_reformat_missing_basepath(caplog):
     """
     runner = CliRunner()
     with runner.isolated_filesystem():
-        test_cwd = Path.cwd()
-
         result = runner.invoke(cli_frontend, ["reformat"])
 
         assert result.exit_code == 2
